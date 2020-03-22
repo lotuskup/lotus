@@ -1,6 +1,12 @@
+import 'dart:convert';
+import 'dart:ffi';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lotus/utility/narmal_dialog.dart';
+import 'package:lotus/widget/my_service.dart';
 import 'package:lotus/widget/register.dart';
 
 class Authen extends StatefulWidget {
@@ -10,13 +16,22 @@ class Authen extends StatefulWidget {
 
 class _AuthenState extends State<Authen> {
 // field
-
+  String user, password;
 // method
 
   Widget singInButton() {
     return RaisedButton(
       color: Colors.blue,
-      onPressed: () {},
+      onPressed: () {
+        if (user == null ||
+            user.isEmpty ||
+            password == null ||
+            password.isEmpty) {
+          narmaldialog(context, 'มีช่องว่าง', 'กรุณากรอกทุกช่อง จร้า');
+        } else {
+          checkAuthen();
+        }
+      },
       child: Text(
         'Sign In',
         style: TextStyle(color: Colors.white),
@@ -24,12 +39,43 @@ class _AuthenState extends State<Authen> {
     );
   }
 
+  Future<void> checkAuthen() async {
+    try {
+      String url =
+          'https://www.androidthai.in.th/rice/getUserWhereUserLotus.php?isAdd=true&User=$user';
+
+      var response = await Dio().get(url);
+      print('response =====>$response');
+
+      if (response.toString() == 'null') {
+        narmaldialog(context, 'User False', 'No $user in my Database');
+      } else {
+        var result = json.decode(response.data);
+        print('result---->$result');
+        for (var map in result) {
+          String truePassword = map['Password'];
+          String nameLogin = map['Name'];
+          if (password == truePassword) {
+            MaterialPageRoute route = MaterialPageRoute(
+              builder: (context) => Myservice(
+                name: nameLogin,
+              ),
+            );
+            Navigator.of(context).pushAndRemoveUntil(route, (value)=>false);
+          } else {
+            narmaldialog(context, 'รหัสผ่านผิดไง ', 'รหัสผ่านผิด ลองใหม่ดิ');
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
   Widget singUpButton() {
     return OutlineButton(
       onPressed: () {
         MaterialPageRoute route =
             MaterialPageRoute(builder: (value) => Register());
-            Navigator.of(context).push(route);
+        Navigator.of(context).push(route);
       },
       child: Text(
         'Sign Up',
@@ -52,6 +98,7 @@ class _AuthenState extends State<Authen> {
     return Container(
       width: 250,
       child: TextField(
+        onChanged: (value) => password = value.trim(),
         obscureText: true,
         decoration: InputDecoration(
           labelText: 'PassWord : ',
@@ -72,6 +119,7 @@ class _AuthenState extends State<Authen> {
     return Container(
       width: 250,
       child: TextField(
+        onChanged: (value) => user = value.trim(),
         decoration: InputDecoration(
           labelText: 'User : ',
           border: OutlineInputBorder(),
