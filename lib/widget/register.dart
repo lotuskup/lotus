@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -7,7 +11,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
 // field
-
+  File file;
 // Method
   Widget nameForm() {
     Color color = Colors.greenAccent;
@@ -30,7 +34,7 @@ class _RegisterState extends State<Register> {
     );
   }
 
- Widget userForm() {
+  Widget userForm() {
     Color color = Colors.orangeAccent;
     String title = 'USER : ';
     String help = 'Type Your User In Blank';
@@ -50,7 +54,8 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
- Widget passwordForm() {
+
+  Widget passwordForm() {
     Color color = Colors.red;
     String title = 'PASSWORD : ';
     String help = 'Type Your Password In Blank';
@@ -71,20 +76,37 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  
-  
-
   Widget showAvartar() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.3,
-      child: Image.asset('images/avartar.png'),
+    return GestureDetector(
+      onTap: () {
+        print('Your Clink Image');
+        cameraThread();
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height * 0.3,
+        child: file == null ? Image.asset('images/avartar.png'): Image.file(file),
+      ),
     );
+    
+  }
+
+  Future<void> cameraThread() async {
+    try {
+      var object = await ImagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 800.0,
+        maxHeight: 800.0,
+      );
+      setState(() {
+        file = object;
+      });
+    } catch (e) {}
   }
 
   Widget regitterButton() {
     return IconButton(
-      icon: Icon(Icons.assignment_ind),
+      icon: Icon(Icons.cloud),
       onPressed: () {},
     );
   }
