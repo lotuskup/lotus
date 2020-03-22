@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lotus/utility/narmal_dialog.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -12,12 +13,14 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
 // field
   File file;
+  String name, user, password, urlPath;
 // Method
   Widget nameForm() {
     Color color = Colors.greenAccent;
     String title = 'NAME : ';
     String help = 'Type Your Name In Blank';
     return TextField(
+      onChanged: (value) => name = value.trim(),
       decoration: InputDecoration(
         enabledBorder:
             UnderlineInputBorder(borderSide: BorderSide(color: color)),
@@ -39,6 +42,7 @@ class _RegisterState extends State<Register> {
     String title = 'USER : ';
     String help = 'Type Your User In Blank';
     return TextField(
+      onChanged: (value) => user = value.trim(),
       decoration: InputDecoration(
         enabledBorder:
             UnderlineInputBorder(borderSide: BorderSide(color: color)),
@@ -60,6 +64,7 @@ class _RegisterState extends State<Register> {
     String title = 'PASSWORD : ';
     String help = 'Type Your Password In Blank';
     return TextField(
+      onChanged: (value) => password = value.trim(),
       decoration: InputDecoration(
         enabledBorder:
             UnderlineInputBorder(borderSide: BorderSide(color: color)),
@@ -85,10 +90,10 @@ class _RegisterState extends State<Register> {
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height * 0.3,
-        child: file == null ? Image.asset('images/avartar.png'): Image.file(file),
+        child:
+            file == null ? Image.asset('images/avartar.png') : Image.file(file),
       ),
     );
-    
   }
 
   Future<void> cameraThread() async {
@@ -107,7 +112,16 @@ class _RegisterState extends State<Register> {
   Widget regitterButton() {
     return IconButton(
       icon: Icon(Icons.cloud),
-      onPressed: () {},
+      onPressed: () {
+        if (file == null) {
+          narmaldialog(context, 'Non Choose Avatar',
+              'Please Click Image For Open Camara');
+        }else if (name==null || name.isEmpty||user==null || user.isEmpty|| password==null || password.isEmpty) {
+          narmaldialog(context, 'Have Space',
+              'Please Fill Every Blank');
+        } else {
+        }
+      },
     );
   }
 
